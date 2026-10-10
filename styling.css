@@ -1,0 +1,16 @@
+.player
+{
+    width:80vmin;
+    height:10%;
+    position: relative;
+    background: #000;
+
+}
+.black-piece
+{
+    background-color: #262421;
+}
+.white-piece
+{
+    background-color: whitesmoke;
+}
