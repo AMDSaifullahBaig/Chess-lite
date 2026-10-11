@@ -1,7 +1,11 @@
+import { isValid } from "./piece_logic.js";
 let piece_array=[];
 const piece_map={"r":"rook","b":"bishop","n":"knight","k":"king","q":"queen","p":"pawn"};
 const seq = "rnbqkbnr|pppppppp|8|8|8|8|PPPPPPPP|RNBQKBNR";
 const boardstate=document.querySelector(".board");
+let dragged=null;
+let dragged_from=null;
+let turn="white";
 
 const init_pieces=(seq)=>{
     let piece_array=[];
@@ -36,14 +40,44 @@ for (let i=0;i<8;i++)
 {
     for (let j=0;j<8;j++)
     {
+        let piece_data=piece_array[i*8+j];
         const square=document.createElement("div")
         square.className=(i+j)%2==0?"white-tile":"black-tile";
-        let piece_data=piece_array[i*8+j];
+        square.dataset.index=i*8+j;
+        square.addEventListener("dragover",(e)=>e.preventDefault())
+        square.addEventListener("drop",(e)=>
+            {
+                if (dragged)
+                {
+                    const dragged_to=+square.dataset.index;
+                    if (dragged_from!=dragged_to && isValid(piece_array,dragged_from,dragged_to))
+                    {
+                        piece_array[dragged_to]=piece_array[dragged_from];
+                        piece_array[dragged_from]=null;
+                        square.innerHTML="";
+                        square.appendChild(dragged);
+                        turn=turn=="black"?"white":"black";
+                    }
+                    dragged=null;
+                    dragged_from=null;
+                }
+            }
+        )
         if (piece_data!=null)
         {
             const piece_div=document.createElement("div");
             piece_div.className = `piece ${piece_data.color}-${piece_data.piece}`;
             piece_div.style.backgroundImage = `url(assets/${piece_data.color}-${piece_data.piece}.svg)`;
+            piece_div.draggable=true;
+            piece_div.addEventListener("dragstart",(e)=>{
+                if (turn!=piece_data.color)
+                {
+                    e.preventDefault();
+                    return;
+                }
+                dragged=piece_div;
+                dragged_from=+piece_div.parentElement.dataset.index;
+            });
             square.appendChild(piece_div);
         }
         boardstate.appendChild(square);
