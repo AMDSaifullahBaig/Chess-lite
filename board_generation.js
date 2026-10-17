@@ -3,9 +3,13 @@ let piece_array=[];
 const piece_map={"r":"rook","b":"bishop","n":"knight","k":"king","q":"queen","p":"pawn"};
 const seq = "rnbqkbnr|pppppppp|8|8|8|8|PPPPPPPP|RNBQKBNR";
 const boardstate=document.querySelector(".board");
+const panel=document.querySelectorAll(".infopanel");
+const left_panel=panel[0];
+const right_panel=panel[1];
 let dragged=null;
 let dragged_from=null;
 let turn="white";
+const captured={};
 
 const init_pieces=(seq)=>{
     let piece_array=[];
@@ -50,6 +54,28 @@ const ClearMoves=()=>
         sq.classList.remove("capture","validmove")
     }
 }
+const AddCaptured=(piece)=>
+{
+    const left_panel=document.getElementById("left_panel");
+    const right_panel=document.getElementById("right_panel");
+    const key=`${piece.color}-${piece.piece}`;
+    if (!captured[key])
+    {
+        const row=document.createElement("div");
+        row.className="CapturedRow";
+        const icon=document.createElement("div");
+        icon.className="CapturedPanel";
+        icon.style.backgroundImage=`url('assets/${key}.svg')`;
+        const label=document.createElement("span");
+        row.appendChild(icon);
+        row.appendChild(label);
+        (piece.color=="white"?left_panel:right_panel).appendChild(row);
+        captured[key]={count:0,label:label};
+    }
+    captured[key].count++;
+    captured[key].label.textContent=`: ${captured[key].count}`;
+};
+
 for (let i=0;i<8;i++)
 {
     for (let j=0;j<8;j++)
@@ -66,6 +92,8 @@ for (let i=0;i<8;i++)
                     const dragged_to=+square.dataset.index;
                     if (dragged_from!=dragged_to && isValid(piece_array,dragged_from,dragged_to))
                     {
+                        if (piece_array[dragged_to])
+                            AddCaptured(piece_array[dragged_to]);
                         piece_array[dragged_to]=piece_array[dragged_from];
                         piece_array[dragged_from]=null;
                         square.innerHTML="";

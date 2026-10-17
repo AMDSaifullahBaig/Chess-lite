@@ -1,6 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <link href="https://api.fontshare.com/v2/css?f[]=zodiak@1&display=swap" rel="stylesheet">
         <meta name="viewport" content="width=device-width",initial-scale=1.0>
         <title>
             chess.com
@@ -10,14 +11,13 @@
     </head>
     <body>
         <script type="module" src="board_generation.js" defer ></script>
-        <script src="piece_logic.js"></script>
-        <div class="infopanel"></div>
+        <div class="infopanel" id="left_panel"></div>
         <div class="center-components">
-            <div class="player"></div>
+            <div class="player">john doe</div>
             <div class="board"></div>
-            <div class="player"></div>
+            <div class="player">alex</div>
         </div>
         
-        <div class="infopanel" style="justify-self: flex-end;"></div>
+        <div class="infopanel" id="right_panel" style="grid-column: 3; justify-self: end;"></div>
     </body>
 </html>
