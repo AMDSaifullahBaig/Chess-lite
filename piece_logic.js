@@ -9,31 +9,40 @@ export const isValid=(piece_array,from,to)=>
 
     const row_diff=Math.abs(from_row-to_row);
     const column_diff=Math.abs(from_column-to_column);
+
+    const isClear=()=>
+        {
+         const sign=Math.sign(to_row-from_row)*8+Math.sign(to_column-from_column);
+         for (let i=from+sign;i!=to;i+=sign)
+            if (piece_array[i])
+                return false;
+        return true;
+        }
     if (to_piece && from_piece.color==to_piece.color) return false;
     switch(from_piece.piece)
     {
         case "rook":
-            return (row_diff==0 || column_diff==0)
+            return (row_diff==0 || column_diff==0) && isClear();
         case "knight":
-            return (row_diff==2 && column_diff==1)||(row_diff==1 && column_diff==2);
+            return (row_diff==2 && column_diff==1)||(row_diff==1 && column_diff==2) && isClear();
         case "bishop":
-            return (row_diff==column_diff);
+            return (row_diff==column_diff) && isClear();
         case "king":
-            return (row_diff<=1 && column_diff<=1)
+            return (row_diff<=1 && column_diff<=1) && isClear();
         case "queen":
-            return (row_diff==0 || column_diff==0 || row_diff==column_diff);
+            return (row_diff==0 || column_diff==0 || row_diff==column_diff)  && isClear();
         case "pawn":
             {
                 const dir=from_piece.color=="white"?-1:1;
                 const start=from_piece.color=="white"?6:1;
                 const moved=to_row-from_row;
                 if (column_diff==1 && moved==dir)
-                    return piece_array[to]!=null;
+                    return piece_array[to]!=null  && isClear();;
                 if (column_diff==0 && piece_array[to]==null)
                 {
                     if (moved==dir)return true;
                     if (start==from_row && moved==2*dir && piece_array[from+dir*8]==null)
-                        return true;
+                        return true  && isClear();
                 }
                 return false;
             }

@@ -35,7 +35,21 @@ const init_pieces=(seq)=>{
 }
 piece_array=init_pieces(seq);
 
-
+const ShowMoves=(from)=>
+{
+    for (let i=0;i<64;i++)
+    {
+        if (isValid(piece_array,from,i))
+        boardstate.children[i].classList.add(piece_array[i]?"capture":"validmove");
+    }
+}
+const ClearMoves=()=>
+{
+    for (const sq of boardstate.children)
+    {
+        sq.classList.remove("capture","validmove")
+    }
+}
 for (let i=0;i<8;i++)
 {
     for (let j=0;j<8;j++)
@@ -60,7 +74,7 @@ for (let i=0;i<8;i++)
                     }
                     dragged=null;
                     dragged_from=null;
-                }
+                }   
             }
         )
         if (piece_data!=null)
@@ -77,8 +91,10 @@ for (let i=0;i<8;i++)
                 }
                 dragged=piece_div;
                 dragged_from=+piece_div.parentElement.dataset.index;
+                ShowMoves(dragged_from);
             });
             square.appendChild(piece_div);
+            piece_div.addEventListener("dragend",ClearMoves);
         }
         boardstate.appendChild(square);
     }

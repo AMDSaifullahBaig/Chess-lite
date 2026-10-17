@@ -41,3 +41,20 @@ body
 
     background-color: aqua;
 }
+
+.white-tile,.black-tile{position:relative;}
+.validmove::after {
+    content:"";
+    position:absolute;
+    inset:35%;
+    border-radius:50%;
+    background:rgba(0,0,0,0.25);
+}
+
+.capture::after {
+    content:"";
+    position:absolute;
+    inset:5%;
+    border-radius:50%;
+    border:0.8vmin solid rgba(0,0,0,0.25);
+}
