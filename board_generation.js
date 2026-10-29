@@ -1,4 +1,4 @@
-import { isValid } from "./piece_logic.js";
+import {isLegal,isInCheck,HasLegalMove} from "./piece_logic.js";
 let piece_array=[];
 const piece_map={"r":"rook","b":"bishop","n":"knight","k":"king","q":"queen","p":"pawn"};
 const seq = "rnbqkbnr|pppppppp|8|8|8|8|PPPPPPPP|RNBQKBNR";
@@ -9,6 +9,8 @@ const right_panel=panel[1];
 let dragged=null;
 let dragged_from=null;
 let turn="white";
+let gameover=false;
+
 const captured={};
 
 const init_pieces=(seq)=>{
@@ -39,11 +41,22 @@ const init_pieces=(seq)=>{
 }
 piece_array=init_pieces(seq);
 
+
+
+const status_box=document.getElementById("status");
+let status_timer=null;
+const ShowStatus=(text)=>
+{
+    status_box.textContent=text;
+    status_box.classList.add("show");
+    clearTimeout(status_timer);
+    status_timer=setTimeout(()=>status_box.classList.remove("show"),2000);
+}
 const ShowMoves=(from)=>
 {
     for (let i=0;i<64;i++)
     {
-        if (isValid(piece_array,from,i))
+        if (isLegal(piece_array,from,i))
         boardstate.children[i].classList.add(piece_array[i]?"capture":"validmove");
     }
 }
@@ -90,7 +103,7 @@ for (let i=0;i<8;i++)
                 if (dragged)
                 {
                     const dragged_to=+square.dataset.index;
-                    if (dragged_from!=dragged_to && isValid(piece_array,dragged_from,dragged_to))
+                    if (dragged_from!=dragged_to && isLegal(piece_array,dragged_from,dragged_to))
                     {
                         if (piece_array[dragged_to])
                             AddCaptured(piece_array[dragged_to]);
@@ -99,6 +112,15 @@ for (let i=0;i<8;i++)
                         square.innerHTML="";
                         square.appendChild(dragged);
                         turn=turn=="black"?"white":"black";
+                        if (!HasLegalMove(piece_array,turn))
+                        {
+                            if (isInCheck(piece_array,turn))
+                                ShowStatus(`${turn=="black"?"White":"Black"} Wins`)
+                            else
+                                ShowStatus("Stalemate, Its a draw",true);
+                        }
+                        else if (isInCheck(piece_array,turn))
+                            ShowStatus(`${turn} is in Check`);
                     }
                     dragged=null;
                     dragged_from=null;
@@ -112,7 +134,7 @@ for (let i=0;i<8;i++)
             piece_div.style.backgroundImage = `url(assets/${piece_data.color}-${piece_data.piece}.svg)`;
             piece_div.draggable=true;
             piece_div.addEventListener("dragstart",(e)=>{
-                if (turn!=piece_data.color)
+                if (gameover || turn!=piece_data.color)
                 {
                     e.preventDefault();
                     return;

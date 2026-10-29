@@ -86,3 +86,21 @@ body
     background-repeat:no-repeat;
     background-position:center;
 }
+#status
+{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    padding: 2vh 4vw;
+    background: #c0392b;
+    color: white;
+    font-size: 4vmin;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+#status.show { opacity: 1; }

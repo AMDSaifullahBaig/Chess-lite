@@ -50,3 +50,42 @@ export const isValid=(piece_array,from,to)=>
     console.log(piece_array);
 return false;
 }
+
+export const isInCheck=(piece_array,color)=>
+{
+    const king=piece_array.findIndex(p=>p && p.color==color && p.piece=="king");
+    const enemy=color=="black"?"white":"black";
+    for (let i=0;i<64;i++)
+    {
+        const p=piece_array[i];
+        if (p && p.color==enemy && isValid(piece_array,i,king))
+            return true;
+    }
+    return false;
+}
+
+export const isLegal=(piece_array,from,to)=>
+{
+    if (!isValid(piece_array,from,to))return false;
+    const copy=[... piece_array];
+    copy[to]=copy[from];
+    copy[from]=null;
+    return !isInCheck(copy,piece_array[from].color);
+}
+
+export const HasLegalMove=(piece_array,color)=>
+{
+    for (let i=0;i<64;i++)
+    {
+        const piece=piece_array[i];
+        if (piece && piece.color==color)
+        {
+            for (let j=0;j<64;j++)
+            {
+                if (isLegal(piece_array,i,j))
+                    return true;
+            }
+        }
+    }
+    return false;   
+}
