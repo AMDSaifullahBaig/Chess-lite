@@ -104,3 +104,32 @@ body
     transition: opacity 0.3s;
 }
 #status.show { opacity: 1; }
+
+#promotion
+{
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    gap: 1vmin;
+    padding: 2vmin;
+    background: #202020;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+}
+#promotion.show { display: flex; }
+
+.PromoChoice
+{
+    width: 10vmin;
+    height: 10vmin;
+    background-color: #393735;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.PromoChoice:hover { background-color: #555; }

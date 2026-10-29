@@ -13,6 +13,47 @@ let gameover=false;
 
 const captured={};
 
+let promoting=false;
+const promotion_box=document.getElementById("promotion");
+
+const EndTurn=()=>
+{
+    turn=turn=="black"?"white":"black";
+    if (!HasLegalMove(piece_array,turn))
+    {
+        gameover=true;
+        if (isInCheck(piece_array,turn))
+            ShowStatus(`Checkmate, ${turn=="white"?"black":"white"} wins`,true);
+        else
+            ShowStatus("Stalemate, it's a draw",true);
+    }
+    else if (isInCheck(piece_array,turn))
+        ShowStatus(`${turn} is in check`);
+};
+
+const AskPromotion=(piece,element)=>
+{
+    promoting=true;
+    promotion_box.innerHTML="";
+    for (const name of ["queen","rook","bishop","knight"])
+    {
+        const choice=document.createElement("div");
+        choice.className="PromoChoice";
+        choice.style.backgroundImage=`url(assets/${piece.color}-${name}.svg)`;
+        choice.addEventListener("click",()=>
+        {
+            piece.piece=name;
+            element.className=`piece ${piece.color}-${name}`;
+            element.style.backgroundImage=`url(assets/${piece.color}-${name}.svg)`;
+            promotion_box.classList.remove("show");
+            promoting=false;
+            EndTurn();
+        });
+        promotion_box.appendChild(choice);
+    }
+    promotion_box.classList.add("show");
+};
+
 const init_pieces=(seq)=>{
     let piece_array=[];
     const rows=seq.split("|");
@@ -40,6 +81,7 @@ const init_pieces=(seq)=>{
     return piece_array;
 }
 piece_array=init_pieces(seq);
+
 
 
 
@@ -111,16 +153,13 @@ for (let i=0;i<8;i++)
                         piece_array[dragged_from]=null;
                         square.innerHTML="";
                         square.appendChild(dragged);
-                        turn=turn=="black"?"white":"black";
-                        if (!HasLegalMove(piece_array,turn))
-                        {
-                            if (isInCheck(piece_array,turn))
-                                ShowStatus(`${turn=="black"?"White":"Black"} Wins`)
-                            else
-                                ShowStatus("Stalemate, Its a draw",true);
-                        }
-                        else if (isInCheck(piece_array,turn))
-                            ShowStatus(`${turn} is in Check`);
+                        const landed=piece_array[dragged_to];
+                        const piece_element=dragged;
+
+                        if (landed.piece=="pawn" && (dragged_to<8 || dragged_to>=56))
+                            AskPromotion(landed,piece_element);
+                        else
+                            EndTurn();
                     }
                     dragged=null;
                     dragged_from=null;
@@ -134,7 +173,7 @@ for (let i=0;i<8;i++)
             piece_div.style.backgroundImage = `url(assets/${piece_data.color}-${piece_data.piece}.svg)`;
             piece_div.draggable=true;
             piece_div.addEventListener("dragstart",(e)=>{
-                if (gameover || turn!=piece_data.color)
+                if (gameover||promoting||turn!=piece_data.color)
                 {
                     e.preventDefault();
                     return;
