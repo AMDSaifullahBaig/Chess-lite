@@ -66,6 +66,9 @@ export const isInCheck=(piece_array,color)=>
 
 export const isLegal=(piece_array,from,to)=>
 {
+    
+    if (piece_array[from].piece=="king" && Math.abs(to-from)==2)
+        return canCastle(from,to,piece_array);
     if (!isValid(piece_array,from,to))return false;
     const copy=[... piece_array];
     copy[to]=copy[from];
@@ -88,4 +91,28 @@ export const HasLegalMove=(piece_array,color)=>
         }
     }
     return false;   
+}
+export const canCastle=(from,to,piece_array)=>
+{
+    
+    const king=piece_array[from];
+    if (king.moved)return false;
+    const dir=to>from?1:-1;
+    const rook_pos=dir==1?from+3:from-4;
+    const rook=piece_array[rook_pos];
+    if (!rook || rook.piece!="rook" || rook.moved || rook.color!=king.color)
+        return false;
+    for (let i=from+dir;i!=rook_pos;i+=dir)
+    {
+        if (piece_array[i])return false;
+    }
+    for(let i of [from,from+dir,to])
+    {
+        const copy=[... piece_array];
+        copy[from]=null;
+        copy[i]=king;
+        if (isInCheck(copy,king.color))
+            return false;
+    }
+    return true;
 }

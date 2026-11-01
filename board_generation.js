@@ -82,9 +82,6 @@ const init_pieces=(seq)=>{
 }
 piece_array=init_pieces(seq);
 
-
-
-
 const status_box=document.getElementById("status");
 let status_timer=null;
 const ShowStatus=(text)=>
@@ -108,6 +105,25 @@ const ClearMoves=()=>
     {
         sq.classList.remove("capture","validmove")
     }
+}
+const Castle=(from,to,piece_array)=>
+{
+    const dir=to>from?1:-1;
+    const rook_pos=from+(dir==1?3:-4);
+    const rook_to=to-dir;
+    const king=piece_array[from];
+    const rook=piece_array[rook_pos];
+    const king_element=boardstate.children[from].firstElementChild;
+    const rook_element=boardstate.children[rook_pos].firstElementChild;
+
+    piece_array[to]=king;
+    piece_array[from]=null;
+    piece_array[rook_to]=rook;
+    piece_array[rook_pos]=null;
+    king.moved=true;
+    rook.moved=true;
+    boardstate.children[to].appendChild(king_element);
+    boardstate.children[rook_to].appendChild(rook_element);
 }
 const AddCaptured=(piece)=>
 {
@@ -147,10 +163,21 @@ for (let i=0;i<8;i++)
                     const dragged_to=+square.dataset.index;
                     if (dragged_from!=dragged_to && isLegal(piece_array,dragged_from,dragged_to))
                     {
+
+                        if (piece_array[dragged_from].piece=="king" && Math.abs(dragged_to-dragged_from)==2)
+                        {
+                            Castle(dragged_from,dragged_to,piece_array);
+                            dragged=null;
+                            dragged_from=null;
+                            EndTurn();
+                            return;
+                        }
                         if (piece_array[dragged_to])
                             AddCaptured(piece_array[dragged_to]);
                         piece_array[dragged_to]=piece_array[dragged_from];
                         piece_array[dragged_from]=null;
+                        piece_array[dragged_to].moved=true;
+
                         square.innerHTML="";
                         square.appendChild(dragged);
                         const landed=piece_array[dragged_to];
